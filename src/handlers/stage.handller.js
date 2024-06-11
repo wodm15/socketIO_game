@@ -21,9 +21,10 @@ export const moveStageHandler = (userId, payload) => {
   const serverTime = Date.now();
   const elapsedTime = (serverTime - currentStage.timestamp) / 1000; // 초 단위로 계산
 
-
+  console.log(`Elapsed Time: ${elapsedTime} seconds`);
+  
   // 클라이언트와 서버 간의 통신 지연시간을 고려해서 오차범위 설정
-  if (elapsedTime < 100 || elapsedTime > 105) {
+  if (elapsedTime < 10 || elapsedTime > 10.5) {
     return { status: 'fail', message: 'Invalid elapsed time' };
   }
 
