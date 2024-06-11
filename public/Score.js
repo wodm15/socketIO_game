@@ -1,4 +1,4 @@
-import { sendEvent } from "./Socket.js";
+import { sendEvent } from './Socket.js';
 
 class Score {
   score = 0;
@@ -16,11 +16,11 @@ class Score {
     if (Math.floor(this.score) === 100 && this.stageChange) {
       this.stageChange = false;
       sendEvent(11, { currentStage: 1000, targetStage: 1001 });
-      console.log(id);
     }
   }
 
   getItem(itemId) {
+    // 아이템 획득시 점수 변화
     this.score += 0;
   }
 
