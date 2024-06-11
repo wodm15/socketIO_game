@@ -1,10 +1,14 @@
+import { getGameAssets } from '../init/assets.js';
+import {clearStage , setStage, getStage} from '../models/stage.model.js';
+
 export const gameStart = (uuid, payload) => {
-    const { stages } = getGameAssets();
-    setStage(uuid, stages.data[0].id, payload.timestamp);
-    console.log('Stage:', getStage(uuid));
-  
-    return { status: 'success' };
-  };
+  const { stages } = getGameAssets();
+  clearStage(uuid);
+  setStage(uuid, stages.data[0].id, payload.timestamp);
+  console.log('Stage:', getStage(uuid));
+
+  return { status: 'success' };
+};
 
   export const gameEnd = (uuid, payload) => {
     // 클라이언트에서 받은 게임 종료 시 타임스탬프와 총 점수
