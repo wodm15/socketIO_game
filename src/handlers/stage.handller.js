@@ -24,7 +24,7 @@ export const moveStageHandler = (userId, payload) => {
   console.log(`Elapsed Time: ${elapsedTime} seconds`);
 
   // 클라이언트와 서버 간의 통신 지연시간을 고려해서 오차범위 설정
-  if (elapsedTime < 0 || elapsedTime > 15) {
+  if (elapsedTime < 0 || elapsedTime > 50) {
     return { status: 'fail', message: 'Invalid elapsed time' };
   }
 
