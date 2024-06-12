@@ -1,31 +1,7 @@
 import { sendEvent } from './Socket.js';
+import { assetData } from './assetImport.js';
 
-const stages = {
-  "name": "stage",
-  "version": "1.0.0",
-  "data": [
-    { "id": 1000, "score": 0, "scorePerSecond": 1 },
-    { "id": 1001, "score": 10, "scorePerSecond": 2 },
-    { "id": 1002, "score": 15, "scorePerSecond": 4 },
-    { "id": 1003, "score": 300, "scorePerSecond": 8 },
-    { "id": 1004, "score": 400, "scorePerSecond": 16 },
-    { "id": 1005, "score": 500, "scorePerSecond": 32 },
-    { "id": 1006, "score": 600, "scorePerSecond": 64 }
-  ]
-};
-
-const items = {
-  "name": "item",
-  "version": "1.0.0",
-  "data": [
-    { "id": 1, "score": 10, "interval": 10 },
-    { "id": 2, "score": 20, "interval": 10 },
-    { "id": 3, "score": 30, "interval": 10 },
-    { "id": 4, "score": 40, "interval": 10 },
-    { "id": 5, "score": 50, "interval": 10 },
-    { "id": 6, "score": 60, "interval": 10 }
-  ]
-};
+console.log(assetData);
 
 class Score {
   constructor(ctx, scaleRatio) {
@@ -37,10 +13,13 @@ class Score {
     this.stageChange = true;
     this.currentStageIndex = 1; // 스테이지 1부터 시작
     this.itemTimestamps = {}; // 아이템 획득 타임스탬프 기록
+
+
   }
 
   update(deltaTime) {
     // 스테이지마다 점수 계산 다르게 변경
+
     for (let i = 0; i < stages.data.length; i++) {
       if (this.currentStageIndex + 999 === stages.data[i].id) {
         this.score += deltaTime * 0.001 * stages.data[i].scorePerSecond;
@@ -64,7 +43,7 @@ class Score {
       console.log(`Item with id ${itemId} not found.`);
       return;
     }
-    
+
     // 타임스탬프 기록이 없으면 초기화
     if (!this.itemTimestamps[itemId]) {
       this.itemTimestamps[itemId] = [];
@@ -80,7 +59,7 @@ class Score {
 
     // 어뷰징 검증
     if (this.itemTimestamps[itemId].length > 5) {
-      console.log(`User is abusing item ${itemId}.`);
+      return { status: 'fail', message: 'you are a hack' };
     } else {
           //item 아이디에 따라 점수가 다름
           for (let i = 0 ; i<items.data.length; i++){
