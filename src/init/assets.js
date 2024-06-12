@@ -12,7 +12,7 @@ const readFileAsync = (filename) => {
   return new Promise((resolve, reject) => {
     fs.readFile(path.join(basePath, filename), 'utf8', (err, data) => {
       if (err) {
-        reject(err);
+        reject(new Error(`Failed to read file ${filePath}: ${err.message}`));
         return;
       }
       resolve(JSON.parse(data));

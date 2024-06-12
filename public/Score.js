@@ -1,9 +1,38 @@
 import { sendEvent } from './Socket.js';
 
+const stages = 
+{
+  "name": "stage",
+  "version": "1.0.0",
+  "data": [
+    { "id":  1000, "score": 0, "scorePerSecond": 1 },
+    { "id":  1001, "score": 10, "scorePerSecond": 2 },
+    { "id":  1002, "score": 15, "scorePerSecond": 4 },
+    { "id":  1003, "score": 300, "scorePerSecond": 8 },
+    { "id":  1004, "score": 400, "scorePerSecond": 16 },
+    { "id":  1005, "score": 500, "scorePerSecond": 32 },
+    { "id":  1006, "score": 600, "scorePerSecond": 64 }
+  ]
+}
+const item = 
+{
+  "name": "item",
+  "version": "1.0.0",
+  "data": [
+    { "id":  1, "score": 10 },
+    { "id":  2, "score": 20 },
+    { "id":  3, "score": 30 },
+    { "id":  4, "score": 40 },
+    { "id":  5, "score": 50 },
+    { "id":  6, "score": 60 }
+  ]
+}
+
 class Score {
   score = 0;
   HIGH_SCORE_KEY = 'highScore';
-  stageChange = true;
+  stageChange = true;    //스테이지 변경시 트리거
+  currentStageIndex = 1; //스테이지 1부터 시작
 
   constructor(ctx, scaleRatio) {
     this.ctx = ctx;
@@ -12,25 +41,33 @@ class Score {
   }
 
   update(deltaTime) {
-    this.score += deltaTime * 0.001;
-    console.log(this.stageChange);
-    if (Math.floor(this.score) === 10 && this.stageChange) {
-      this.stageChange = false;
-      sendEvent(11, { currentStage: 1000, targetStage: 1001 });
-    }
-    if (Math.floor(this.score) === 12){
-      this.stageChange = true;
-    }
-    else if (Math.floor(this.score) === 20 && this.stageChange) {
-      this.stageChange = false;
-      sendEvent(11, { currentStage: 1001, targetStage: 1002 });
-    }
-    
-  }
 
+    //스테이지마다 점수계산 다르게 변경
+    for (let i=0; i <stages.data.length ; i++){
+      if(this.currentStageIndex +999 === stages.data[i].id){
+        this.score += deltaTime * 0.001 * stages.data[i].scorePerSecond;
+      }
+    }
+
+    // console.log(this.stageChange);
+    
+  // 전체 돌아서 score 과 this score 이 같아지면 sendEvent를 보낸다.
+
+  for (let i = this.currentStageIndex ; i < stages.data.length; i++) {
+    if (Math.floor(this.score) >= stages.data[i].score) {
+      sendEvent(11, { currentStage: stages.data[i - 1].id, targetStage: stages.data[i].id });
+      this.currentStageIndex = i+1;
+    }
+  }
+}
+
+  //item 아이디에 따라 점수가 다름
   getItem(itemId) {
-    // 아이템 획득시 점수 변화
-    this.score += 0;
+    for (let i = 0 ; i<item.data.length; i++){
+      if(itemId === item.data[i].id){
+        this.score += item.data[i].score
+      }
+    }
   }
 
   reset() {
