@@ -1,12 +1,6 @@
-import { sendEvent } from './Socket.js';
+import { sendEvent } from './Socket.js'; 
 import { fetchAssets } from './assetImport.js';
-
-let stages, items;
-
-fetchAssets().then(assetData => {
-  stages = assetData.stages;
-  items = assetData.items;
-});
+import {socket} from './Socket.js';
 
 class Score {
   constructor(ctx, scaleRatio) {
@@ -18,26 +12,39 @@ class Score {
     this.stageChange = true;
     this.currentStageIndex = 1;
     this.itemTimestamps = {};
+
+
   }
 
   update(deltaTime) {
-    for (let i = 0; i < stages.data.length; i++) {
-      if (this.currentStageIndex + 999 === stages.data[i].id) {
-        this.score += deltaTime * 0.001 * stages.data[i].scorePerSecond;
-      }
-    }
+    fetchAssets().then(assetData => {
+      this.stages = assetData.stages;
+      this.items = assetData.items;
 
-    for (let i = this.currentStageIndex; i < stages.data.length; i++) {
-      if (Math.floor(this.score) >= stages.data[i].score) {
-        sendEvent(11, { currentStage: stages.data[i - 1].id, targetStage: stages.data[i].id });
-        this.currentStageIndex = i + 1;
+      for (let i = 0; i < this.stages.data.length; i++) {
+        if (this.currentStageIndex + 999 === this.stages.data[i].id) {
+          this.score += deltaTime * 0.001 * this.stages.data[i].scorePerSecond;
+        }
       }
-    }
+
+      for (let i = this.currentStageIndex; i < this.stages.data.length; i++) {
+        if (Math.floor(this.score) >= this.stages.data[i].score) {
+          sendEvent(11, { currentStage: this.stages.data[i - 1].id, targetStage: this.stages.data[i].id });
+          this.currentStageIndex = i + 1;
+        }
+      }
+    });
   }
 
   getItem(itemId) {
     const currentTime = Date.now();
-    const item = items.data.find(item => item.id === itemId);
+
+    if (!this.items || !Array.isArray(this.items.data)) {
+      console.log('Assets not loaded properly.');
+      return;
+    }
+
+    const item = this.items.data.find(item => item.id === itemId);
 
     if (!item) {
       console.log(`Item with id ${itemId} not found.`);
@@ -57,10 +64,10 @@ class Score {
     if (this.itemTimestamps[itemId].length > 5) {
       return { status: 'fail', message: 'you are a hack' };
     } else {
-      for (let i = 0; i < items.data.length; i++) {
-        if (itemId === items.data[i].id) {
-          this.score += items.data[i].score;
-          console.log(`${items.data[i].score} 추가 획득`);
+      for (let i = 0; i < this.items.data.length; i++) {
+        if (itemId === this.items.data[i].id) {
+          this.score += this.items.data[i].score;
+          console.log(`${this.items.data[i].score} 추가 획득`);
         }
       }
       console.log(`현재 점수: ${this.score}`);
@@ -75,6 +82,8 @@ class Score {
     const highScore = Number(localStorage.getItem(this.HIGH_SCORE_KEY));
     if (this.score > highScore) {
       localStorage.setItem(this.HIGH_SCORE_KEY, Math.floor(this.score));
+      console.log('최고기록 갱신');
+      socket.emit('최고기록 갱신', { score: Math.floor(this.score) });
     }
   }
 

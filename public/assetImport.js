@@ -10,7 +10,6 @@ export function fetchAssets() {
     })
     .then(data => {
       assetData = data;
-      console.log(assetData);
       return assetData; 
     })
     .catch(error => {

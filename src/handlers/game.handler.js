@@ -1,12 +1,15 @@
 import { getGameAssets } from '../init/assets.js';
 import {clearStage , setStage, getStage} from '../models/stage.model.js';
 
+
+
 export const gameStart = (uuid, payload) => {
   const { stages } = getGameAssets();
   clearStage(uuid);
   setStage(uuid, stages.data[0].id, payload.timestamp);
   console.log('Stage:', getStage(uuid));
 
+  //broadcast 추가해보기
   return { status: 'success' };
 };
 

@@ -16,6 +16,7 @@ export const handleConnection = (socket, userUUID) => {
   
     createStage(userUUID);  // 스테이지 빈 배열 생성
     socket.emit('connection', { uuid: userUUID });
+
   };
 
 export const handlerEvent = (id, socket, data) =>{
