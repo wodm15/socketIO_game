@@ -8,7 +8,6 @@ export const gameStart = (uuid, payload) => {
   clearStage(uuid);
   setStage(uuid, stages.data[0].id, payload.timestamp);
   console.log('Stage:', getStage(uuid));
-
   //broadcast 추가해보기
   return { status: 'success' };
 };
