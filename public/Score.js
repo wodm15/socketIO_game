@@ -1,7 +1,12 @@
 import { sendEvent } from './Socket.js';
-import { assetData } from './assetImport.js';
+import { fetchAssets } from './assetImport.js';
 
-console.log(assetData);
+let stages, items;
+
+fetchAssets().then(assetData => {
+  stages = assetData.stages;
+  items = assetData.items;
+});
 
 class Score {
   constructor(ctx, scaleRatio) {
@@ -11,22 +16,17 @@ class Score {
     this.score = 0;
     this.HIGH_SCORE_KEY = 'highScore';
     this.stageChange = true;
-    this.currentStageIndex = 1; // 스테이지 1부터 시작
-    this.itemTimestamps = {}; // 아이템 획득 타임스탬프 기록
-
-
+    this.currentStageIndex = 1;
+    this.itemTimestamps = {};
   }
 
   update(deltaTime) {
-    // 스테이지마다 점수 계산 다르게 변경
-
     for (let i = 0; i < stages.data.length; i++) {
       if (this.currentStageIndex + 999 === stages.data[i].id) {
         this.score += deltaTime * 0.001 * stages.data[i].scorePerSecond;
       }
     }
 
-    // 전체 돌아서 score와 this score가 같아지면 sendEvent를 보낸다.
     for (let i = this.currentStageIndex; i < stages.data.length; i++) {
       if (Math.floor(this.score) >= stages.data[i].score) {
         sendEvent(11, { currentStage: stages.data[i - 1].id, targetStage: stages.data[i].id });
@@ -44,30 +44,25 @@ class Score {
       return;
     }
 
-    // 타임스탬프 기록이 없으면 초기화
     if (!this.itemTimestamps[itemId]) {
       this.itemTimestamps[itemId] = [];
     }
 
-    // 현재 시간 기록
     this.itemTimestamps[itemId].push(currentTime);
 
-    // 최근 10초 이내의 타임스탬프만 남기기
     this.itemTimestamps[itemId] = this.itemTimestamps[itemId].filter(
       timestamp => currentTime - timestamp <= 10000
     );
 
-    // 어뷰징 검증
     if (this.itemTimestamps[itemId].length > 5) {
       return { status: 'fail', message: 'you are a hack' };
     } else {
-          //item 아이디에 따라 점수가 다름
-          for (let i = 0 ; i<items.data.length; i++){
-          if(itemId === items.data[i].id){
-          this.score += items.data[i].score
-          console.log(`${items.data[i].score} 추가 획득` )
+      for (let i = 0; i < items.data.length; i++) {
+        if (itemId === items.data[i].id) {
+          this.score += items.data[i].score;
+          console.log(`${items.data[i].score} 추가 획득`);
+        }
       }
-    }
       console.log(`현재 점수: ${this.score}`);
     }
   }
