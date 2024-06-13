@@ -84,7 +84,7 @@ class Score {
 
   setHighScore() {
     const highScore = Number(localStorage.getItem(this.HIGH_SCORE_KEY));
-    if (this.score ) {
+    if (this.score > highScore) {
       console.log('최고기록 갱신');
       socket.emit('최고기록 갱신', { score: Math.floor(this.score) });
       sendEvent(12, { score: Math.floor(this.score) });
