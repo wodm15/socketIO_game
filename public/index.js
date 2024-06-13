@@ -5,6 +5,7 @@ import Score from './Score.js';
 import ItemController from './ItemController.js';
 import {sendEvent} from './Socket.js';
 
+
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
@@ -214,6 +215,9 @@ function gameLoop(currentTime) {
   if (!gameover && cactiController.collideWith(player)) {
     gameover = true;
     score.setHighScore();
+    // score.updateHighScore();
+  
+
     setupGameReset();
   }
   const collideWithItem = itemController.collideWith(player);

@@ -2,6 +2,8 @@ import { CLIENT_VERSION } from '../constants.js';
 import { getUsers, removeUser} from '../models/user.model.js';
 import handlerMappings from './handlerMapping.js';
 import { createStage } from '../models/stage.model.js';
+import {highScoreHandler} from '../handlers/highScore.handler.js';
+import { io } from '../init/socket.js';
 
 export const handleDisconnect = (socket, uuid) => {
   removeUser(socket.id); // 사용자 삭제
@@ -30,6 +32,12 @@ export const handlerEvent = (id, socket, data) =>{
         socket.emit('response', {status: "fail",message: "Handler not found"})
         return;
     }
+  // handler가 highscore 갱신일 경우
+  if (data.handlerId === 12) {
+    const highscore = data.payload;
+    io.emit('highScoreUpdate', { highScore: highscore });
+  }
+
     
     const response= handler(data.userId, data.payload);
 

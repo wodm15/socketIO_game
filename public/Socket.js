@@ -16,6 +16,15 @@ socket.on('connection', (data) => {
   userId = data.uuid;
 });
 
+// 높은 점수 서버에서 받기
+let highScoreUpdate = null;
+socket.on('highScoreUpdate', (data) => {
+  highScoreUpdate = data;
+  console.log('High score updated:', highScoreUpdate.highScore);
+});
+
+
+//이벤트 전송 함수
 const sendEvent = (handlerId, payload) => {
   socket.emit('event', {
     userId,
@@ -25,4 +34,4 @@ const sendEvent = (handlerId, payload) => {
   });
 };
 
-export { sendEvent };
+export { sendEvent} ;

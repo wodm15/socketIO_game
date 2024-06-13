@@ -13,8 +13,13 @@ class Score {
     this.currentStageIndex = 1;
     this.itemTimestamps = {};
 
-
+    // 높은 점수 업데이트 이벤트 등록
+    socket.on('highScoreUpdate', (data) => {
+      this.updateHighScore(data.highScore);
+    });
   }
+
+  
 
   update(deltaTime) {
     fetchAssets().then(assetData => {
@@ -38,7 +43,6 @@ class Score {
 
   getItem(itemId) {
     const currentTime = Date.now();
-
     if (!this.items || !Array.isArray(this.items.data)) {
       console.log('Assets not loaded properly.');
       return;
@@ -70,7 +74,7 @@ class Score {
           console.log(`${this.items.data[i].score} 추가 획득`);
         }
       }
-      console.log(`현재 점수: ${this.score}`);
+      console.log(`현재 점수: ${Math.floor(this.score)}`);
     }
   }
 
@@ -80,14 +84,20 @@ class Score {
 
   setHighScore() {
     const highScore = Number(localStorage.getItem(this.HIGH_SCORE_KEY));
-    if (this.score > highScore) {
-      localStorage.setItem(this.HIGH_SCORE_KEY, Math.floor(this.score));
+    if (this.score ) {
       console.log('최고기록 갱신');
       socket.emit('최고기록 갱신', { score: Math.floor(this.score) });
       sendEvent(12, { score: Math.floor(this.score) });
     }
   }
 
+
+  updateHighScore(newHighScore) {
+    console.log('High score updated:', newHighScore);
+    localStorage.setItem(this.HIGH_SCORE_KEY, newHighScore.score);
+  }
+  
+  
   getScore() {
     return this.score;
   }
